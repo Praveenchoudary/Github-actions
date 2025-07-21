@@ -9,7 +9,7 @@ on:
 jobs:
   build-test:
     name: Build and Test Python App
-    runs-on: self-hsoted
+    runs-on: self-hosted
 
     steps:
     - name: 📥 Checkout Code
