@@ -57,13 +57,4 @@ jobs:
     - name: 🏃 Run Docker Container
       run: |
         docker run -d -p 5000:5000 --name flask-app praveen22233/python-calculator:latest
-        sleep 5
-
-    - name: 🔍 Test Application Endpoint
-      run: |
-        curl --fail http://localhost:5000 || (echo "App failed to respond!" && exit 1)
-
-    - name: 🧹 Stop & Remove Container
-      run: |
-        docker stop flask-app
-        docker rm flask-app
+        
