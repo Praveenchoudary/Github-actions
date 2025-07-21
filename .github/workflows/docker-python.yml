@@ -9,7 +9,7 @@ on:
 jobs:
   docker:
     name: Docker Build & Push
-    runs-on: ubuntu-latest  # or ubuntu-latest if no runner
+    runs-on: self-hosted  # or ubuntu-latest if no runner
 
     steps:
     - name:  Checkout code
