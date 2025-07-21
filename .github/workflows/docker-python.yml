@@ -9,7 +9,7 @@ on:
 jobs:
   build-test:
     name: Build and Test Python App
-    runs-on: ubuntu-latest
+    runs-on: self-hsoted
 
     steps:
     - name: 📥 Checkout Code
@@ -31,7 +31,7 @@ jobs:
 
   docker:
     name: Docker Build, Push, and Run Container
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build-test
 
     steps:
