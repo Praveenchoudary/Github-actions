@@ -1,4 +1,4 @@
-name: CI/CD - Python Flask Docker Build, Push, and Run Test
+name: CI/CD - Python Flask Docker Build, Push, and Run container
 
 on:
   push:
