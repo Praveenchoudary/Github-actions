@@ -24,18 +24,23 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
+    - name: Extract Git Commit SHA
+      id: vars
+      run: echo "sha_tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
     - name: Build & Push Docker Image
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: praveen22233/flask-welcome:latest
+        tags: |
+          praveen22233/flask-welcome:latest
+          praveen22233/flask-welcome:${{ steps.vars.outputs.sha_tag }}
 
     - name: Run Docker Container
       run: |
         docker rm -f flask-welcome || true
         docker run -itd -p 5000:5000 --name flask-welcome praveen22233/flask-welcome:latest
-
 
         
 
