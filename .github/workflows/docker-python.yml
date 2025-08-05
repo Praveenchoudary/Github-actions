@@ -9,26 +9,30 @@ on:
 jobs:
   docker:
     name: Docker Build & Push with Trivy and SonarQube
-    runs-on: self-hosted  # Use 'ubuntu-latest' if not using a self-hosted runner
+    runs-on: self-hosted  # Use 'ubuntu-latest' if you don't have a self-hosted runner
 
     steps:
+    # Step 1: Checkout Source Code
     - name: Checkout Code
       uses: actions/checkout@v3
 
+    # Step 2: Set up Docker Buildx
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
+    # Step 3: Log in to DockerHub
     - name: Log in to DockerHub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
+    # Step 4: Set Short SHA Tag
     - name: Set Image Tag
       id: vars
       run: echo "sha_tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-    # 🔍 SonarQube Scan
+    # Step 5: Run SonarQube Scan (Self-Hosted or SonarCloud)
     - name: SonarQube Scan
       uses: SonarSource/sonarcloud-github-action@v2
       env:
@@ -37,20 +41,10 @@ jobs:
         projectBaseDir: .
         args: >
           -Dsonar.projectKey=flask-welcome
-          -Dsonar.organization=praveen
+          -Dsonar.organization=your_org_key  # Remove this line if using self-hosted SonarQube
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
 
-    # 🛡️ Trivy Vulnerability Scan
-    - name: Run Trivy Scan
-      uses: aquasecurity/trivy-action@v0.16.1
-      with:
-        image-ref: praveen22233/flask-welcome:latest
-        format: table
-        exit-code: 0
-        ignore-unfixed: true
-        vuln-type: os,library
-        severity: CRITICAL,HIGH
-
+    # Step 6: Build & Push Docker Image to DockerHub
     - name: Build & Push Docker Image
       uses: docker/build-push-action@v5
       with:
@@ -60,15 +54,29 @@ jobs:
           praveen22233/flask-welcome:latest
           praveen22233/flask-welcome:${{ steps.vars.outputs.sha_tag }}
 
+    # Step 7: Run Trivy Scan on Built Image
+    - name: Run Trivy Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: praveen22233/flask-welcome:latest
+        format: table
+        exit-code: 0
+        ignore-unfixed: true
+        vuln-type: os,library
+        severity: CRITICAL,HIGH
+
+    # Step 8: Remove Old Container/Image (Clean-Up)
     - name: Remove Existing Container and Image
       run: |
         docker rm -f flask-welcome || true
         docker rmi -f praveen22233/flask-welcome:latest || true
 
+    # Step 9: Pull and Run Updated Container
     - name: Pull & Run New Container
       run: |
         docker pull praveen22233/flask-welcome:latest
         docker run -itd -p 5000:5000 --name flask-welcome praveen22233/flask-welcome:latest
+
 
 
 
