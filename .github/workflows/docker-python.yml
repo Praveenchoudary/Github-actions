@@ -41,7 +41,6 @@ jobs:
         projectBaseDir: .
         args: >
           -Dsonar.projectKey=flask-welcome
-          -Dsonar.organization=your_org_key  # Remove this line if using self-hosted SonarQube
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
 
     # Step 6: Build & Push Docker Image to DockerHub
