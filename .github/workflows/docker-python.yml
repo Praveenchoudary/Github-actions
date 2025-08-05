@@ -8,7 +8,7 @@ on:
 
 jobs:
   docker:
-    name: Docker Build & Push
+    name: Docker Build & Push with Trivy and SonarQube
     runs-on: self-hosted  # Use 'ubuntu-latest' if not using a self-hosted runner
 
     steps:
@@ -28,6 +28,29 @@ jobs:
       id: vars
       run: echo "sha_tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
+    # 🔍 SonarQube Scan
+    - name: SonarQube Scan
+      uses: SonarSource/sonarcloud-github-action@v2
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        projectBaseDir: .
+        args: >
+          -Dsonar.projectKey=flask-welcome
+          -Dsonar.organization=praveen
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+
+    # 🛡️ Trivy Vulnerability Scan
+    - name: Run Trivy Scan
+      uses: aquasecurity/trivy-action@v0.16.1
+      with:
+        image-ref: praveen22233/flask-welcome:latest
+        format: table
+        exit-code: 0
+        ignore-unfixed: true
+        vuln-type: os,library
+        severity: CRITICAL,HIGH
+
     - name: Build & Push Docker Image
       uses: docker/build-push-action@v5
       with:
@@ -46,6 +69,7 @@ jobs:
       run: |
         docker pull praveen22233/flask-welcome:latest
         docker run -itd -p 5000:5000 --name flask-welcome praveen22233/flask-welcome:latest
+
 
 
         
